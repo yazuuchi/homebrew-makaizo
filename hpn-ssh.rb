@@ -36,7 +36,7 @@ class HpnSsh < Formula
     # Patch for SSH tunnelling issues caused by launchd changes on Yosemite
     patch do
       url "https://raw.githubusercontent.com/Homebrew/patches/d8b2d8c2/OpenSSH/launchd.patch"
-      Sha256 "df61404042385f2491dd7389c83c3ae827bf3997b1640252b018f9230eab3db3"
+      sha256 "df61404042385f2491dd7389c83c3ae827bf3997b1640252b018f9230eab3db3"
     end
   end
 
