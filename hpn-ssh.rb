@@ -8,7 +8,7 @@ class HpnSsh < Formula
   version "7.2p2"
   sha256 "a72781d1a043876a224ff1b0032daa4094d87565a68528759c1c2cab5482548c"
 
-  option 'with-brewed-openssl', 'Build with Homebrew OpenSSL instead of the system version'
+  option 'without-brewed-openssl', 'Build without Homebrew OpenSSL. Use the system version'
   option 'without-keychain-support', 'Build without keychain and launch daemon support'
   option "with-libressl", "Build with LibreSSL instead of OpenSSL"
 
