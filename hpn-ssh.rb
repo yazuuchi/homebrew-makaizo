@@ -65,11 +65,13 @@ class HpnSsh < Formula
   if build.with? 'keychain-support'
     patch do
       url "http://www.honeyplanet.jp/openssh_72p2_post_hpn14v10_keychain.diff"
-      sha256 "e79197d2ea59f50dcd5696abd3db70dae710313c978a2c867b3336e23ebfb283"
+      sha256 "e6ac06e9d0c57dacd7948dd37379ab2a6c837a753a8d5db6f050b5e3cd43d08a"
     end
   end
 
   def install
+    ENV.append "CPPFLAGS", "-D__APPLE_SANDBOX_NAMED_EXTERNAL__" if OS.mac?
+
     if build.with? "keychain-support"
       ENV.append "CPPFLAGS", "-D__APPLE_LAUNCHD__ -D__APPLE_KEYCHAIN__"
       ENV.append "LDFLAGS", "-framework CoreFoundation -framework SecurityFoundation -framework Security"
@@ -77,12 +79,20 @@ class HpnSsh < Formula
 
     args = %W[
       --with-libedit
+      --with-pam
       --with-kerberos5
       --prefix=#{prefix}
       --sysconfdir=#{etc}/ssh
     ]
 
-    args << "--with-ssl-dir=#{Formula.factory('openssl').opt_prefix}" if build.with? 'brewed-openssl'
+    if build.with? "libressl"
+      args << "--with-ssl-dir=#{Formula["libressl"].opt_prefix}"
+    elsif build.with? "brewed-openssl"
+      args << "--with-ssl-dir=#{Formula["openssl"].opt_prefix}"
+    else
+      args<< "--with-ssl-dir=/usr"
+    end
+
     args << "--with-ldns" if build.with? "ldns"
     args << "--without-openssl-header-check"
 
