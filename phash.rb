@@ -44,7 +44,9 @@ class Phash < Formula
     args << "--disable-video-hash" if build.without? "video-hash"
     args << "--disable-audio-hash" if build.without? "audio-hash"
 
-    system "/usr/local/bin/automake"
+    system "aclocal -I ."
+    system "/usr/local/bin/glibtoolize"
+    system "/usr/local/bin/automake --add-missing"
     system "/usr/local/bin/autoreconf"
     system "./configure", *args
     system "make", "install"
