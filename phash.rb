@@ -47,7 +47,7 @@ class Phash < Formula
     system "/usr/local/bin/aclocal -I ."
     system "/usr/local/bin/glibtoolize"
     system "/usr/local/bin/automake --add-missing"
-    system "/usr/local/bin/autoreconf"
+    system "/usr/local/bin/autoconf"
     system "./configure", *args
     system "make", "install"
   end
