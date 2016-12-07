@@ -5,12 +5,6 @@ class Protobuf < Formula
   sha256 "0a0ae63cbffc274efb573bdde9a253e3f32e458c41261df51c5dbc5ad541e8f7"
   head "https://github.com/google/protobuf.git"
 
-  bottle do
-    sha256 "937351ede8db879b572c43994845d49a0dafc890a2ee0caf99c61b3ed75c2d76" => :sierra
-    sha256 "561c3788b7b3cc1df6fce744c20c5ef85fd484cc3177e14525e262f0544b4fe5" => :el_capitan
-    sha256 "902bc03d7ee53fb688ae428bc24aa33c1122b8bf40530da3b5e8f6883e3ec125" => :yosemite
-  end
-
   # this will double the build time approximately if enabled
   option "with-test", "Run build-time check"
   option "without-python", "Build without python support"
@@ -65,6 +59,8 @@ class Protobuf < Formula
     mirror "https://dl.bintray.com/homebrew/mirror/gmock-1.7.0.zip"
     sha256 "26fcbb5925b74ad5fc8c26b0495dfc96353f4d553492eb97e85a8a6d2f43095b"
   end
+
+  patch :DATA
 
   def install
     # Don't build in debug mode. See:
@@ -132,3 +128,20 @@ class Protobuf < Formula
     system "python", "-c", "import google.protobuf" if build.with? "python"
   end
 end
+
+__END__
+diff -r b9082035e410 src/google/protobuf/io/coded_stream.h
+--- a/src/google/protobuf/io/coded_stream.h	Wed Dec 07 10:21:57 2016 +0900
++++ b/src/google/protobuf/io/coded_stream.h	Wed Dec 07 10:25:17 2016 +0900
+@@ -622,9 +622,9 @@ class LIBPROTOBUF_EXPORT CodedInputStrea
+   // Return the size of the buffer.
+   int BufferSize() const;
+ 
+-  static const int kDefaultTotalBytesLimit = 64 << 20;  // 64MB
++  static const int kDefaultTotalBytesLimit = INT_MAX;  // virtually unlimited
+ 
+-  static const int kDefaultTotalBytesWarningThreshold = 32 << 20;  // 32MB
++  static const int kDefaultTotalBytesWarningThreshold = 128 << 20;  // 128MB
+ 
+   static int default_recursion_limit_;  // 100 by default.
+ };
