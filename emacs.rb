@@ -5,9 +5,24 @@ class Emacs < Formula
   mirror "https://ftp.gnu.org/gnu/emacs/emacs-24.5.tar.xz"
   sha256 "dd47d71dd2a526cf6b47cb49af793ec2e26af69a0951cc40e43ae290eacfc34e"
 
+  devel do
+    url "https://alpha.gnu.org/gnu/emacs/pretest/emacs-25.2-rc1.tar.xz"
+    sha256 "a94e8e190992627c9b7ef5683d267663bb4c9c2880ef5093988ba42cf8aeae2b"
+  end
+
+  head do
+    url "https://github.com/emacs-mirror/emacs.git"
+
+    depends_on "autoconf" => :build
+    depends_on "automake" => :build
+    depends_on "gnu-sed" => :build
+    depends_on "texinfo" => :build
+  end
+
   option "with-cocoa", "Build a Cocoa version of emacs"
   option "with-ctags", "Don't remove the ctags executable that emacs provides"
   option "without-libxml2", "Don't build with libxml2 support"
+  option "with-modules", "Compile with dynamic modules support"
 
   deprecated_option "cocoa" => "with-cocoa"
   deprecated_option "keep-ctags" => "with-ctags"
@@ -16,7 +31,7 @@ class Emacs < Formula
   depends_on "pkg-config" => :build
   depends_on "dbus" => :optional
   depends_on "gnutls" => :optional
-  depends_on "librsvg" => :recommended
+  depends_on "librsvg" => :optional
   depends_on "imagemagick" => :optional
   depends_on "mailutils" => :optional
 
@@ -48,11 +63,19 @@ class Emacs < Formula
       args << "--without-gnutls"
     end
 
-    args << "--with-rsvg" if build.with? "librsvg"
     args << "--with-imagemagick" if build.with? "imagemagick"
+    args << "--with-modules" if build.with? "modules"
+    args << "--with-rsvg" if build.with? "librsvg"
+    args << "--without-pop" if build.with? "mailutils"
+    # no need?
+    args << "--with-rsvg" if build.with? "librsvg"
     args << "--without-popmail" if build.with? "mailutils"
 
-    system "./autogen.sh" if build.head? || build.devel?
+    #system "./autogen.sh" if build.head? || build.devel?
+    if build.head?
+      ENV.prepend_path "PATH", Formula["gnu-sed"].opt_libexec/"gnubin"
+      system "./autogen.sh"
+    end
 
     if build.with? "cocoa"
       args << "--with-ns" << "--disable-ns-self-contained"
@@ -65,13 +88,13 @@ class Emacs < Formula
     system "make", "install"
 
     if build.with? "cocoa"
-      # Remove when 25.1 is released
-      if build.stable?
-        chmod 0644, %w[nextstep/Emacs.app/Contents/PkgInfo
-                       nextstep/Emacs.app/Contents/Resources/Credits.html
-                       nextstep/Emacs.app/Contents/Resources/document.icns
-                       nextstep/Emacs.app/Contents/Resources/Emacs.icns]
-      end
+      ## Remove when 25.1 is released
+      #if build.stable?
+      #  chmod 0644, %w[nextstep/Emacs.app/Contents/PkgInfo
+      #                 nextstep/Emacs.app/Contents/Resources/Credits.html
+      #                 nextstep/Emacs.app/Contents/Resources/document.icns
+      #                 nextstep/Emacs.app/Contents/Resources/Emacs.icns]
+      #end
       prefix.install "nextstep/Emacs.app"
 
       # Replace the symlink with one that avoids starting Cocoa.
