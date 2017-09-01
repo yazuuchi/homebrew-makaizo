@@ -49,7 +49,7 @@ class HpnSsh < Formula
   if build.with? 'keychain-support'
     patch do
       url "http://www.honeyplanet.jp/openssh-7_5_P1-post-hpn14.13-keychain"
-      sha256 "148bb75dcd2c5749fb156b18e7246f4c0a7c098c291c76c1fa20283445cb84b9"
+      sha256 "4c4f430b4fb605800aaf09d8ad3828b0b1fbfde88896429c6040f0830251add8"
     end
   end
 
