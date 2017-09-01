@@ -42,7 +42,7 @@ class HpnSsh < Formula
   # yaz hpn
   patch do
     url "http://www.honeyplanet.jp/openssh-7_5_P1-hpn-14.13"
-    sha256 "acac3fa6f0653c4d11f0f78bd975475e5defdfacb8bc1f68d4f985c20bf3df59"
+    sha256 "8c1eb4792d680cacfabcf948186fb249c22de02e7c38827aedb5bc0a857467f9"
   end
 
   # yaz keychain
