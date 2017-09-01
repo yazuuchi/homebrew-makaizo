@@ -3,10 +3,10 @@ require 'formula'
 class HpnSsh < Formula
   desc "OpenBSD freely-licensed SSH connectivity tools"
   homepage "http://www.openssh.com/"
-  url "http://ftp.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-7.2p2.tar.gz"
-  mirror "https://www.mirrorservice.org/pub/OpenBSD/OpenSSH/portable/openssh-7.2p2.tar.gz"
-  version "7.2p2"
-  sha256 "a72781d1a043876a224ff1b0032daa4094d87565a68528759c1c2cab5482548c"
+  url "http://ftp.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-7.5p1.tar.gz"
+  mirror "https://www.mirrorservice.org/pub/OpenBSD/OpenSSH/portable/openssh-7.5p1.tar.gz"
+  version "7.5p1"
+  sha256 "9846e3c5fab9f0547400b4d2c017992f914222b3fd1f8eee6c7dc6bc5e59f9f0"
 
   option 'without-brewed-openssl', 'Build without Homebrew OpenSSL. Use the system version'
   option 'without-keychain-support', 'Build without keychain and launch daemon support'
@@ -33,39 +33,23 @@ class HpnSsh < Formula
       sha256 "3505c58bf1e584c8af92d916fe5f3f1899a6b15cc64a00ddece1dc0874b2f78f"
     end
 
-    # Patch for SSH tunnelling issues caused by launchd changes on Yosemite
-    patch do
-      url "https://raw.githubusercontent.com/Homebrew/patches/d8b2d8c2/OpenSSH/launchd.patch"
-      sha256 "df61404042385f2491dd7389c83c3ae827bf3997b1640252b018f9230eab3db3"
+    resource "com.openssh.sshd.sb" do
+      url "https://opensource.apple.com/source/OpenSSH/OpenSSH-209.50.1/com.openssh.sshd.sb"
+      sha256 "a273f86360ea5da3910cfa4c118be931d10904267605cdd4b2055ced3a829774"
     end
   end
 
   # yaz hpn
   patch do
-    url "http://www.honeyplanet.jp/openssh_72p2_hpn14v10_progressbar.diff"
-    sha256 "405b56b7078f50a8e9745f4b444c6e352a5e82cff1b4041087592f855d6b9775"
-  end
-
-  patch do
-    url "http://www.honeyplanet.jp/openssh_72p2_hpn14v10_none_cipher.diff"
-    sha256 "cacbf00b5e3dc10ccb8c8ca4ffc58634e18db19f11123f67d091e7a99536bab5"
-  end
-
-  patch do
-    url "http://www.honeyplanet.jp/openssh_72p2_hpn14v10_multi_threaded_cipher.diff"
-    sha256 "2e98c4b68d6d7a05f8803a7a4f5d4db15a2647bee74340a54f9529b4ea7020ff"
-  end
-
-  patch do
-    url "http://www.honeyplanet.jp/openssh_72p2_hpn14v10_dynamically_sized_receive_buffers.diff"
-    sha256 "17dd2c66615612997862296ccf175e5364e3e08b6643d4f3a378039085d62bcb"
+    url "http://www.honeyplanet.jp/openssh-7_5_P1-hpn-14.13"
+    sha256 "acac3fa6f0653c4d11f0f78bd975475e5defdfacb8bc1f68d4f985c20bf3df59"
   end
 
   # yaz keychain
   if build.with? 'keychain-support'
     patch do
-      url "http://www.honeyplanet.jp/openssh_72p2_post_hpn14v10_keychain.diff"
-      sha256 "e6ac06e9d0c57dacd7948dd37379ab2a6c837a753a8d5db6f050b5e3cd43d08a"
+      url "http://www.honeyplanet.jp/openssh-7_5_P1-post-hpn14.13-keychain"
+      sha256 "148bb75dcd2c5749fb156b18e7246f4c0a7c098c291c76c1fa20283445cb84b9"
     end
   end
 
@@ -100,6 +84,14 @@ class HpnSsh < Formula
     system "./configure", *args
     system "make"
     system "make install"
+
+    # This was removed by upstream with very little announcement and has
+    # potential to break scripts, so recreate it for now.
+    # Debian have done the same thing.
+    bin.install_symlink bin/"ssh" => "slogin"
+
+    buildpath.install resource("com.openssh.sshd.sb")
+    (etc/"ssh").install "com.openssh.sshd.sb" => "org.openssh.sshd.sb"
   end
 
   def caveats
