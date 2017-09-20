@@ -1,14 +1,8 @@
 class Emacs < Formula
   desc "GNU Emacs text editor"
   homepage "https://www.gnu.org/software/emacs/"
-  url "https://ftpmirror.gnu.org/emacs/emacs-24.5.tar.xz"
-  mirror "https://ftp.gnu.org/gnu/emacs/emacs-24.5.tar.xz"
-  sha256 "dd47d71dd2a526cf6b47cb49af793ec2e26af69a0951cc40e43ae290eacfc34e"
-
-  devel do
-    url "https://alpha.gnu.org/gnu/emacs/pretest/emacs-25.2-rc1.tar.xz"
-    sha256 "a94e8e190992627c9b7ef5683d267663bb4c9c2880ef5093988ba42cf8aeae2b"
-  end
+  url "https://ftp.gnu.org/gnu/emacs/emacs-25.3.tar.xz"
+  sha256 "253ac5e7075e594549b83fd9ec116a9dc37294d415e2f21f8ee109829307c00b"
 
   head do
     url "https://github.com/emacs-mirror/emacs.git"
@@ -34,6 +28,8 @@ class Emacs < Formula
   depends_on "librsvg" => :optional
   depends_on "imagemagick" => :optional
   depends_on "mailutils" => :optional
+
+  patch :DATA
 
   def install
     args = %W[
@@ -67,9 +63,6 @@ class Emacs < Formula
     args << "--with-modules" if build.with? "modules"
     args << "--with-rsvg" if build.with? "librsvg"
     args << "--without-pop" if build.with? "mailutils"
-    # no need?
-    args << "--with-rsvg" if build.with? "librsvg"
-    args << "--without-popmail" if build.with? "mailutils"
 
     #system "./autogen.sh" if build.head? || build.devel?
     if build.head?
@@ -88,13 +81,6 @@ class Emacs < Formula
     system "make", "install"
 
     if build.with? "cocoa"
-      ## Remove when 25.1 is released
-      #if build.stable?
-      #  chmod 0644, %w[nextstep/Emacs.app/Contents/PkgInfo
-      #                 nextstep/Emacs.app/Contents/Resources/Credits.html
-      #                 nextstep/Emacs.app/Contents/Resources/document.icns
-      #                 nextstep/Emacs.app/Contents/Resources/Emacs.icns]
-      #end
       prefix.install "nextstep/Emacs.app"
 
       # Replace the symlink with one that avoids starting Cocoa.
@@ -146,3 +132,20 @@ class Emacs < Formula
     assert_equal "4", shell_output("#{bin}/emacs --batch --eval=\"(print (+ 2 2))\"").strip
   end
 end
+
+__END__
+diff -uprN emacs-25.1.org/src/keyboard.c emacs-25.1/src/keyboard.c
+--- emacs-25.1.org/src/keyboard.c	2016-08-02 17:06:01.000000000 +0900
++++ emacs-25.1/src/keyboard.c	2017-04-17 00:47:59.000000000 +0900
+@@ -2467,10 +2467,8 @@ read_char (int commandflag, Lisp_Object 
+ 	swallow_events (false);		/* May clear input_pending.  */
+ 
+       /* Redisplay if no pending input.  */
+-      while (!(input_pending
+-	       && (input_was_pending || !redisplay_dont_pause)))
++      while (!input_pending)
+ 	{
+-	  input_was_pending = input_pending;
+ 	  if (help_echo_showing_p && !EQ (selected_window, minibuf_window))
+ 	    redisplay_preserve_echo_area (5);
+ 	  else
