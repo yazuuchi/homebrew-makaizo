@@ -1,8 +1,9 @@
 class Fdclone < Formula
   desc "Console-based file manager"
   homepage "http://hp.vector.co.jp/authors/VA012337/soft/fd/"
-  url "http://hp.vector.co.jp/authors/VA012337/soft/fd/FD-3.01b.tar.gz"
-  sha256 "d66d902cac9d4f64a91d42ceb487a138d544c9fd9cb2961730889cc8830303d4"
+  #url "http://hp.vector.co.jp/authors/VA012337/soft/fd/FD-3.01e.tar.gz"
+  url "http://www.honeyplanet.jp/FD-3.01e.tar.gz"
+  sha256 "0ddabfdbab6c26fb54fc0d84ea9203ac5f29ea3f99b39f13a4f4537b2bd9c300"
 
   depends_on "nkf" => :build
 
@@ -22,7 +23,7 @@ class Fdclone < Formula
     share.install "_fdrc" => "fd2rc.dist"
   end
 
-  def caveats; <<-EOS.undent
+  def caveats; <<~EOS.undent
     To install the initial config file:
         install -c -m 0644 #{share}/fd2rc.dist ~/.fd2rc
     To set application messages to Japanese, edit your .fd2rc:
